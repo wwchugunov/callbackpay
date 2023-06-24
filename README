@@ -1,0 +1,31 @@
+                                      Connect to the database
+
+host =  PostgreSQL 
+password = Qq123456
+user = u8802
+database =  botuser 
+_________________________________________________________________________________________________
+
+                                           Table example
+
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  chat_id BIGINT UNIQUE,
+  company_name VARCHAR(255),
+  phone_number VARCHAR(255),
+  full_name VARCHAR(255),
+  merchants TEXT[]
+);
+Next step =  ALTER TABLE users ALTER COLUMN id TYPE bigint;
+_________________________________________________________________________________________________
+
+                                            libraries
+
+libraries used = ['express', 'pg', 'node-telegram-bot-api', 'cors', 'dotenv', 'Sequelize']
+dev libraries = ['nodemon']
+
+example .env file
+
+DB_CONNECTION_STRING=postgresql://user:password@host:port/namedatabase
+TELEGRAM_TOKEN=token
+_________________________________________________________________________________________________
