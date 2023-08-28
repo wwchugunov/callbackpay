@@ -3,10 +3,13 @@ const { Pool } = require('pg');
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-
+const fs = require('fs')
+const https = require('https')
+const host = ''
+const port = 6060;
 
 const app = express();
-const port = 3000;
+
 app.use(cors());
 
 app.use(express.json());
@@ -38,22 +41,26 @@ app.post('/', (req, res) => {
       let message = `<b>Оплата</b>\n`;
       if (req.body.order_status === 'approved') {
         message += `<b>Статус</b><b>   Успешно ✅</b>\n`;
-      } else if (req.body.order_status === 'processing') {
-        message += `<b>Статус</b><b>   В обработке 🔴</b>\n`;
+      } else if (req.body.order_status === 'declined') {
+        message += `<b>Статус</b><b>   отменена🔴</b>\n`;
       } else if (req.body.response_status === 'Loading') {
         message += `<b>Статус</b><b>   Операция в обработке</b>\n`;
       } else if (req.body.response_status === '404') {
         message += `<b>Статус</b><b>   Нет ответа от сервера попробуйте позже</b>\n`;
       }
 
-      const merchant_data = JSON.parse(req.body.merchant_data);
+
+      const merchant_data = req.body.merchant_data ? JSON.parse(req.body.merchant_data) : [];
       merchant_data.forEach(item => {
         const value = item.value;
-        message += `${item.label}  ${value}\n`;
+        message += `${item.label} ${value}\n`;
       });
+
 
       message += `<b>Код ответа</b> ${req.body.response_code}\n`;
       message += `<b>Метод оплаты</b> ${req.body.payment_system}\n`;
+
+
 
       // Преобразование суммы в десятичную
       let totalAmount = req.body.amount / 100;
@@ -73,7 +80,7 @@ app.post('/', (req, res) => {
 });
 
 
-app.listen(port, () => {
+app.listen(port, host, () => {
   console.log(`Server is running on port ${port}`);
 });
 
@@ -121,11 +128,20 @@ bot.onText(/Создать мерчанта/, async (msg) => {
   bot.sendMessage(chatId, 'Введите имя мерчанта:');
   bot.once('message', async (msg) => {
     const merchantName = msg.text;
+    if (!merchantName) {
+      bot.sendMessage(chatId, 'Имя мерчанта не может быть пустым.');
+      return;
+    }
+    if (!/^\d+$/.test(merchantName)) {
+      bot.sendMessage(chatId, 'Имя мерчанта должно содержать только цифры.');
+      return;
+    }
     await createMerchant(chatId, merchantName);
     bot.sendMessage(chatId, `Мерчант "${merchantName}" успешно создан.`);
     showMainMenu(chatId);
   });
 });
+
 
 bot.onText(/Удалить мерчанта/, async (msg) => {
   const chatId = msg.chat.id;
