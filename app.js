@@ -239,7 +239,7 @@ function showMainMenu(chatId) {
     },
   };
 
-  bot.sendMessage(chatId, '======', options);
+  bot.sendMessage(chatId, 'Выбирете действие', options);
 }
 
 app.get('/merchants', async (req, res) => {
